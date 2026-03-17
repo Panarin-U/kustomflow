@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm create vite@latest web -- --template react)",
+      "Bash(npm install)",
+      "Bash(npm install express cors)",
+      "Bash(npm install --save-dev concurrently)"
+    ]
+  }
+}
