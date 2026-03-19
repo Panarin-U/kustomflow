@@ -32,7 +32,7 @@ async function cloneRepo(repoName, protocol = 'ssh') {
   return { alreadyExists: false, cloneDir };
 }
 
-app.get('/api/repos', (req, res) => {
+app.get('/api/repos', (_req, res) => {
   const gitRepoDir = path.join(__dirname, 'git-repo');
   if (!existsSync(gitRepoDir)) {
     return res.json({ repos: [] });
@@ -142,13 +142,15 @@ app.get('/api/config', (req, res) => {
   return res.json(result);
 });
 
-app.post('/api/save-config', (req, res) => {
+app.post('/api/save-config', async (req, res) => {
   const { repoName, env, config, secret } = req.body;
   if (!repoName || !env) {
     return res.status(400).json({ error: 'repoName and env are required' });
   }
 
-  const base = path.join(__dirname, 'git-repo', repoName, `overlays/${env}`);
+  const cloneDir = path.join(__dirname, 'git-repo', repoName);
+  const base = path.join(cloneDir, `overlays/${env}`);
+  const filesToAdd = [];
 
   try {
     if (config !== undefined) {
@@ -157,6 +159,7 @@ app.post('/api/save-config', (req, res) => {
         return res.status(404).json({ error: 'configs/config.env not found' });
       }
       writeFileSync(configPath, config, 'utf8');
+      filesToAdd.push(`overlays/${env}/configs/config.env`);
     }
     if (secret !== undefined) {
       const secretPath = path.join(base, 'secrets/secret.env');
@@ -164,8 +167,21 @@ app.post('/api/save-config', (req, res) => {
         return res.status(404).json({ error: 'secrets/secret.env not found' });
       }
       writeFileSync(secretPath, secret, 'utf8');
+      filesToAdd.push(`overlays/${env}/secrets/secret.env`);
     }
-    return res.json({ status: 'saved' });
+
+    const repoGit = simpleGit(cloneDir);
+    await repoGit.add(filesToAdd);
+
+    const diffStat = await repoGit.diff(['--cached', '--stat']);
+    if (!diffStat.trim()) {
+      return res.json({ status: 'saved', message: 'No changes to commit' });
+    }
+
+    await repoGit.commit(`update ${env} config`);
+    await repoGit.push('origin', 'develop');
+
+    return res.json({ status: 'saved', message: 'Config saved and pushed to develop' });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
