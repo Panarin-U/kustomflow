@@ -264,6 +264,12 @@ body {
   color: #fb923c;
 }
 
+.subtab-active.subtab-pfm {
+  background: #1e1a2e;
+  border-color: #7c3aed;
+  color: #a78bfa;
+}
+
 .subtab:disabled {
   opacity: 0.4;
   cursor: not-allowed;
@@ -480,6 +486,14 @@ body {
 
 .btn.btn-orange:hover:not(:disabled) {
   background: #9a3412;
+}
+
+.btn.btn-purple {
+  background: #7c3aed;
+}
+
+.btn.btn-purple:hover:not(:disabled) {
+  background: #6d28d9;
 }
 
 .btn:disabled {

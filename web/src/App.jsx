@@ -292,7 +292,7 @@ function UpdateTagPage() {
       <p className="page-desc">Update <code>newTag</code> in <code>overlays/{env}/kustomization.yaml</code> and push to <code>develop</code></p>
 
       <div className="subtabs">
-        {['stg', 'prd'].map((e) => (
+        {['stg', 'prd', 'pfm'].map((e) => (
           <button
             key={e}
             type="button"
@@ -418,7 +418,7 @@ function UpdateTagPage() {
             </div>
           )}
 
-          <button className={`btn ${env === 'prd' ? 'btn-orange' : 'btn-green'}`} type="submit" disabled={!canSubmit}>
+          <button className={`btn ${env === 'prd' ? 'btn-orange' : env === 'pfm' ? 'btn-purple' : 'btn-green'}`} type="submit" disabled={!canSubmit}>
             {loading ? 'Updating...' : `Update & Push to develop (${entries.filter((en) => en.repoName && en.newTag.trim()).length})`}
           </button>
         </form>

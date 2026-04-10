@@ -68,8 +68,8 @@ app.post('/api/update-tag', async (req, res) => {
     return res.status(400).json({ error: 'repoName and newTag are required' });
   }
 
-  if (!['stg', 'prd'].includes(env)) {
-    return res.status(400).json({ error: 'env must be "stg" or "prd"' });
+  if (!['stg', 'prd', 'pfm'].includes(env)) {
+    return res.status(400).json({ error: 'env must be "stg", "prd" or "pfm"' });
   }
 
   const cloneDir = path.join(__dirname, 'git-repo', repoName);
